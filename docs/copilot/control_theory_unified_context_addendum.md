@@ -13,7 +13,7 @@ the primary quick reference, but the full textbook can now be loaded for deeper 
 ## Revision 2: STOP-GATE — Missing Sources Required Before MATLAB Phase
 
 **Status (2026-02-26): RESOLVED.** The required files are now present under
-`docs/Exam 3 Prep/Exam 3 Prep/`, so MATLAB tool development may proceed.
+`docs/Exam3Prep/`, so MATLAB tool development may proceed.
 
 ### Previously Missing Files (Now Present)
 
