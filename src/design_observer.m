@@ -1,10 +1,16 @@
 function [L, obs_poles] = design_observer(A, C, desired_obs_poles)
-% DESIGN_OBSERVER  Compute observer gain L for state estimation.
+% DESIGN_OBSERVER  Pick an observer gain L to estimate the state.
 %
 %   [L, obs_poles] = design_observer(A, C, desired_obs_poles)
 %
-%   A Luenberger observer estimates the state vector x from the output y:
-%     x_hat_dot = A*x_hat + B*u + L*(y - C*x_hat)
+%   Beginner version:
+%     An observer is a “state guesser”: it uses your measurements y to
+%     estimate the full state x.
+%     This function picks L so the estimation error goes away quickly.
+%
+%   When to use this:
+%     Use this after you have (A,C) and you want an estimate of x when you
+%     can only measure y.
 %
 %   The estimation error e = x - x_hat evolves as:
 %     e_dot = (A - L*C) * e
@@ -54,17 +60,17 @@ function [L, obs_poles] = design_observer(A, C, desired_obs_poles)
 
 % ---- Input validation ----
 if ~ismatrix(A) || size(A, 1) ~= size(A, 2)
-    error('A must be a square matrix.');
+    error('A must be a square matrix (n-by-n).');
 end
 n = size(A, 1);
 
 if size(C, 1) ~= 1 || size(C, 2) ~= n
-    error('C must be a 1-by-%d row vector.', n);
+    error('C must be a 1-by-%d row vector (single output / SISO).', n);
 end
 
 desired_obs_poles = desired_obs_poles(:);
 if numel(desired_obs_poles) ~= n
-    error('desired_obs_poles must have exactly %d elements.', n);
+    error('desired_obs_poles must have exactly %d elements (one per state).', n);
 end
 
 % ---- Observability check ----
@@ -75,7 +81,7 @@ for k = 2:n
     OM(k, :) = OM(k-1, :) * A;
 end
 if rank(OM) < n
-    error('System (A, C) is not observable. Observer design is impossible.');
+    error('System (A,C) is not observable, so an observer cannot be designed. (Tip: run check_observability(A,C).)');
 end
 
 % ---- Observer gain via transpose trick ----

@@ -1,11 +1,17 @@
 function [K, cl_poles] = design_state_feedback(A, B, desired_poles)
-% DESIGN_STATE_FEEDBACK  Compute state-feedback gain K for pole placement.
+% DESIGN_STATE_FEEDBACK  Pick a feedback gain K to get the poles you want.
 %
 %   [K, cl_poles] = design_state_feedback(A, B, desired_poles)
 %
-%   State feedback: u = r - K*x  →  x_dot = (A - B*K)*x + B*r
-%   The gain vector K is chosen so that the eigenvalues of (A - B*K)
-%   equal the desired closed-loop pole locations.
+%   Beginner version:
+%     This chooses K in the feedback law u = r - Kx so the closed-loop
+%     system (A - B*K) has the pole locations you asked for.
+%     “Poles” are numbers that (roughly) set how fast the response dies out
+%     and whether it oscillates.
+%
+%   When to use this:
+%     Use this after you have a state-space model (A,B) and a set of desired
+%     closed-loop poles (often chosen from overshoot/settling-time specs).
 %
 %   This function uses MATLAB's place() for numerical pole placement.
 %   For phase-variable form (B = [0;...;0;1]), the result is equivalent
@@ -45,17 +51,17 @@ function [K, cl_poles] = design_state_feedback(A, B, desired_poles)
 
 % ---- Input validation ----
 if ~ismatrix(A) || size(A, 1) ~= size(A, 2)
-    error('A must be a square matrix.');
+    error('A must be a square matrix (n-by-n).');
 end
 n = size(A, 1);
 
 if size(B, 1) ~= n || size(B, 2) ~= 1
-    error('B must be an n-by-1 column vector.');
+    error('B must be an n-by-1 column vector (SISO input).');
 end
 
 desired_poles = desired_poles(:);
 if numel(desired_poles) ~= n
-    error('desired_poles must have exactly %d elements (same as system order).', n);
+    error('desired_poles must have exactly %d elements (one per state).', n);
 end
 
 % ---- Controllability check ----
@@ -66,7 +72,7 @@ for k = 2:n
     CM(:, k) = A * CM(:, k-1);
 end
 if rank(CM) < n
-    error('System (A, B) is not controllable. Pole placement is impossible.');
+    error('System (A,B) is not controllable, so pole placement cannot be done. (Tip: run check_controllability(A,B).)');
 end
 
 % ---- Pole placement via place() ----

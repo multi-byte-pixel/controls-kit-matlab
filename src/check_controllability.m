@@ -1,15 +1,16 @@
 function [is_controllable, CM, rank_CM] = check_controllability(A, B)
-% CHECK_CONTROLLABILITY  Determine if a state-space system is controllable.
+% CHECK_CONTROLLABILITY  Check if you can control all the states.
 %
 %   [is_controllable, CM, rank_CM] = check_controllability(A, B)
 %
-%   A system (A, B) is controllable if and only if the controllability
-%   matrix CM = [B, AB, A^2B, ..., A^{n-1}B] has full row rank (rank = n).
+%   Beginner version:
+%     “Controllable” means the input can influence every state in the model.
+%     If it’s not controllable, some parts of the state cannot be moved by
+%     the input, so state-feedback pole placement may fail.
 %
-%   Controllability means every state can be driven to any desired value
-%   in finite time using the input u. If the system is not controllable,
-%   some internal states cannot be influenced by the input — this makes
-%   pole placement via state feedback impossible.
+%   How it works (optional detail):
+%     Build CM = [B, AB, A^2B, ..., A^{n-1}B]. The system is controllable
+%     when rank(CM) = n.
 %
 %   INPUTS:
 %     A  — n-by-n system (state) matrix
@@ -39,12 +40,12 @@ function [is_controllable, CM, rank_CM] = check_controllability(A, B)
 
 % ---- Input validation ----
 if ~ismatrix(A) || size(A, 1) ~= size(A, 2)
-    error('A must be a square matrix.');
+    error('A must be a square matrix (n-by-n).');
 end
 n = size(A, 1);
 
 if size(B, 1) ~= n
-    error('B must have the same number of rows as A (%d).', n);
+    error('B must have the same number of rows as A (expected %d).', n);
 end
 
 % ---- Build controllability matrix: CM = [B, AB, A^2B, ..., A^{n-1}B] ----

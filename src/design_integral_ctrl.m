@@ -1,11 +1,17 @@
 function [K, ke, cl_poles] = design_integral_ctrl(A, B, C, desired_poles)
-% DESIGN_INTEGRAL_CTRL  Design integral control to eliminate steady-state error.
+% DESIGN_INTEGRAL_CTRL  Add an integrator to remove steady-state error.
 %
 %   [K, ke, cl_poles] = design_integral_ctrl(A, B, C, desired_poles)
 %
-%   Standard state feedback (u = r - Kx) cannot guarantee zero steady-state
-%   error for step inputs. Integral control adds an extra state x_N that
-%   accumulates the error between the reference r and the output y:
+%   Beginner version:
+%     If your output “almost reaches” the target but has a leftover offset,
+%     an integrator can fix that by accumulating (adding up) the tracking
+%     error over time.
+%
+%   How it works (optional detail):
+%     Standard state feedback (u = r - Kx) cannot guarantee zero steady-state
+%     error for step inputs. Integral control adds an extra state x_N that
+%     accumulates the error between the reference r and the output y:
 %
 %     x_N_dot = r - C*x  (integrator of tracking error)
 %     u = -K*x + ke*x_N  (control law with integral action)
@@ -65,21 +71,21 @@ function [K, ke, cl_poles] = design_integral_ctrl(A, B, C, desired_poles)
 
 % ---- Input validation ----
 if ~ismatrix(A) || size(A, 1) ~= size(A, 2)
-    error('A must be a square matrix.');
+    error('A must be a square matrix (n-by-n).');
 end
 n = size(A, 1);
 
 if size(B, 1) ~= n || size(B, 2) ~= 1
-    error('B must be an n-by-1 column vector.');
+    error('B must be an n-by-1 column vector (SISO input).');
 end
 
 if size(C, 1) ~= 1 || size(C, 2) ~= n
-    error('C must be a 1-by-n row vector.');
+    error('C must be a 1-by-n row vector (single output / SISO).');
 end
 
 desired_poles = desired_poles(:);
 if numel(desired_poles) ~= n + 1
-    error('desired_poles must have exactly %d elements (n+1 for augmented system).', n + 1);
+    error('desired_poles must have exactly %d elements (n+1 because of the integrator state).', n + 1);
 end
 
 % ---- Build augmented system ----
@@ -102,7 +108,7 @@ for k = 2:n_aug
     CM_aug(:, k) = A_aug * CM_aug(:, k-1);
 end
 if rank(CM_aug) < n_aug
-    error('Augmented system is not controllable. Integral control design is impossible.');
+    error('Augmented system is not controllable, so integral-control pole placement cannot be done.');
 end
 
 % ---- Pole placement on augmented system ----

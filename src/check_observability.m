@@ -1,15 +1,17 @@
 function [is_observable, OM, rank_OM] = check_observability(A, C)
-% CHECK_OBSERVABILITY  Determine if a state-space system is observable.
+% CHECK_OBSERVABILITY  Check if you can “see” all the states from outputs.
 %
 %   [is_observable, OM, rank_OM] = check_observability(A, C)
 %
-%   A system (A, C) is observable if and only if the observability matrix
-%   OM = [C; CA; CA^2; ...; CA^{n-1}] has full column rank (rank = n).
+%   Beginner version:
+%     “Observable” means the measurements (outputs) contain enough
+%     information to figure out the full state.
+%     If it’s not observable, some parts of the state never show up in the
+%     output, so an observer (state estimator) cannot recover them.
 %
-%   Observability means every initial state x(0) can be uniquely determined
-%   from the output y(t) and input u(t). If the system is not observable,
-%   some internal states are "hidden" from the output — this makes observer
-%   (state estimator) design impossible for those modes.
+%   How it works (optional detail):
+%     Build OM = [C; CA; CA^2; ...; CA^{n-1}]. The system is observable when
+%     rank(OM) = n.
 %
 %   INPUTS:
 %     A  — n-by-n system (state) matrix
@@ -42,12 +44,12 @@ function [is_observable, OM, rank_OM] = check_observability(A, C)
 
 % ---- Input validation ----
 if ~ismatrix(A) || size(A, 1) ~= size(A, 2)
-    error('A must be a square matrix.');
+    error('A must be a square matrix (n-by-n).');
 end
 n = size(A, 1);
 
 if size(C, 2) ~= n
-    error('C must have the same number of columns as A (%d).', n);
+    error('C must have the same number of columns as A (expected %d).', n);
 end
 
 % ---- Build observability matrix: OM = [C; CA; CA^2; ...; CA^{n-1}] ----

@@ -63,7 +63,7 @@ if isfield(specs, 'Ts')
 elseif isfield(specs, 'Tp')
     time_val = specs.Tp;
 else
-    error('specs must contain either .Ts or .Tp');
+    error('specs must contain either specs.Ts or specs.Tp (time in seconds).');
 end
 
 % ---- Step 1: Convert TF to state-space ----
@@ -103,7 +103,7 @@ elseif n > 2
     end
     desired_poles = [dom_poles; extra_poles];
 else
-    error('System order must be at least 2.');
+    error('System order must be at least 2 (2nd-order dominant specs need at least two states).');
 end
 
 result.desired_poles = desired_poles;
