@@ -15,10 +15,16 @@ This project is tested with MATLAB from the VS Code terminal using batch mode.
 In a terminal:
 
 ```powershell
-where matlab
+where.exe matlab
 ```
 
-If `where matlab` does not find it, use the full executable path:
+Alternative (PowerShell-native):
+
+```powershell
+(Get-Command matlab).Source
+```
+
+If MATLAB is not found, use the full executable path:
 
 ```powershell
 "C:\Program Files\MATLAB\R2025b\bin\matlab.exe" -batch "disp('MATLAB_CONNECTED')"
