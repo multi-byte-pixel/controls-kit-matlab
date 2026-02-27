@@ -175,3 +175,50 @@ After answering the prompts the wizard:
 4. Open your Simulink model, reference A/B/C/D/K/L by name in block dialogs.
 5. Run the simulation — verify step response matches specs.
 ```
+
+## Guided Tour of `src/`
+
+Each file in [`src/`](src/) is a self-contained MATLAB function with a detailed header comment explaining what it does, how it works, and common mistakes. Below is a quick map to help you navigate the toolkit.
+
+### Orchestrator
+
+| File | What it does |
+|---|---|
+| [`full_system_design.m`](src/full_system_design.m) | End-to-end pipeline: converts a transfer function, checks controllability/observability, computes desired poles, designs K and L (and optionally Ki), then verifies everything. Start here to see how all the pieces fit together. |
+| [`exam_wizard.m`](src/exam_wizard.m) | Interactive Q&A script that walks you through entering a transfer function, performance specs, and options, then calls `full_system_design` and prints exam-ready results plus a Simulink checklist. |
+
+### Transfer-Function → State-Space Conversion
+
+| File | What it does |
+|---|---|
+| [`tf2ss_phase.m`](src/tf2ss_phase.m) | Converts G(s) = num(s)/den(s) into **phase-variable** (companion) form — the realization used for state-feedback design because `B = [0;…;0;1]`. |
+| [`tf2ss_observer_canon.m`](src/tf2ss_observer_canon.m) | Converts the same transfer function into **observer canonical** form — the realization used for observer design because `C = [1 0 … 0]`. |
+
+### Performance Specs → Pole Locations
+
+| File | What it does |
+|---|---|
+| [`specs_to_poles.m`](src/specs_to_poles.m) | Turns overshoot (OS%) and a time spec (settling time Ts or peak time Tp) into the dominant second-order complex pole pair, plus intermediate values ζ, ωn, σ, ωd. |
+
+### Controller & Observer Design
+
+| File | What it does |
+|---|---|
+| [`design_state_feedback.m`](src/design_state_feedback.m) | Computes the state-feedback gain **K** via pole placement so that `eig(A − B·K)` matches your desired poles. Includes control-theory intuition, a worked example, and a list of common mistakes. |
+| [`design_observer.m`](src/design_observer.m) | Computes the observer gain **L** via the transpose trick (`place(A′, C′, poles)′`) so that the estimation-error dynamics `A − L·C` converge quickly. Explains the duality between observability and controllability. |
+| [`design_integral_ctrl.m`](src/design_integral_ctrl.m) | Augments the system with an integrator state and finds `[K, ke]` so that steady-state tracking error is zero for step inputs. Explains the augmented-system construction and the sign convention for ke. |
+
+### System Analysis
+
+| File | What it does |
+|---|---|
+| [`check_controllability.m`](src/check_controllability.m) | Builds the controllability matrix `CM = [B, AB, …, A^{n-1}B]` and checks whether `rank(CM) = n`. Required before state-feedback design. |
+| [`check_observability.m`](src/check_observability.m) | Builds the observability matrix `OM = [C; CA; …; CA^{n-1}]` and checks whether `rank(OM) = n`. Required before observer design. |
+| [`check_stability.m`](src/check_stability.m) | Checks open-loop stability by inspecting `eig(A)` — counts right-half-plane, left-half-plane, and imaginary-axis poles. |
+
+### Verification & Export
+
+| File | What it does |
+|---|---|
+| [`verify_solution.m`](src/verify_solution.m) | Confirms that the designed gains K (and optional ke) and L actually produce the expected closed-loop and observer poles, returning PASS/FAIL flags and maximum pole errors. |
+| [`export_to_simulink.m`](src/export_to_simulink.m) | Assigns all design variables (A, B, C, D, K, L, Ki, poles) to the MATLAB base workspace and prints a step-by-step Simulink block-connection checklist. |
