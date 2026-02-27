@@ -1,4 +1,4 @@
-docs/
+# docs/
 github/
 .git/
 
@@ -9,6 +9,7 @@ github/
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+!.vscode/tasks.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

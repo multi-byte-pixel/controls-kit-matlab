@@ -1,0 +1,91 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "MATLAB: Run Phase 1 Tests",
+			"detail": "Run the full Phase 1 test suite in batch mode.",
+			"type": "shell",
+			"command": "matlab",
+			"args": [
+				"-batch",
+				"run('tests/run_phase1_tests.m')"
+			],
+			"windows": {
+				"command": "\"C:\\Program Files\\MATLAB\\R2025b\\bin\\matlab.exe\"",
+				"args": [
+					"-batch",
+					"run('tests/run_phase1_tests.m')"
+				]
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"clear": true
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "MATLAB: Run Active File",
+			"detail": "Run whichever .m file is currently open in batch mode.",
+			"type": "shell",
+			"command": "matlab",
+			"args": [
+				"-batch",
+				"run('${relativeFile}')"
+			],
+			"windows": {
+				"command": "\"C:\\Program Files\\MATLAB\\R2025b\\bin\\matlab.exe\"",
+				"args": [
+					"-batch",
+					"run('${relativeFile}')"
+				]
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"clear": true
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "MATLAB: Exam Wizard (interactive)",
+			"detail": "Launch the Q&A wizard — collects your transfer function, specs, then runs the full design. Requires input at each prompt.",
+			"type": "shell",
+			"command": "matlab",
+			"args": [
+				"-nosplash",
+				"-nodesktop",
+				"-r",
+				"cd('${workspaceFolder}'); run('src/exam_wizard.m'); exit"
+			],
+			"windows": {
+				"command": "\"C:\\Program Files\\MATLAB\\R2025b\\bin\\matlab.exe\"",
+				"args": [
+					"-nosplash",
+					"-nodesktop",
+					"-r",
+					"cd('${workspaceFolder}'); run('src/exam_wizard.m'); exit"
+				]
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"clear": true
+			},
+			"problemMatcher": []
+		}
+	]
+}
